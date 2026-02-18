@@ -1,0 +1,15 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: send-message-frontend
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    networks:
+      - send_message_network
+
+networks:
+  send_message_network:
+    external: true
