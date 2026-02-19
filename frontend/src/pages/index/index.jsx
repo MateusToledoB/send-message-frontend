@@ -119,14 +119,22 @@ function IndexPage() {
     setSubmitMessage('');
 
     try {
-      await sendFolhaPonto({
+      const response = await sendFolhaPonto({
         file: uploadedFile,
         columnName: nameColumn,
         columnMonth: competencyColumn,
         columnContact: phoneColumn,
       });
 
-      setSubmitMessage('Folha de ponto enviada com sucesso.');
+      const publishedMessages = response?.published_messages;
+
+      if (publishedMessages == null || publishedMessages === 0) {
+        setSubmitMessage('Nao tem mensagens para serem enviadas.');
+      } else if (publishedMessages > 0) {
+        setSubmitMessage(`As mensagens vao ser enviadas (${publishedMessages}).`);
+      } else {
+        setSubmitMessage('Folha de ponto enviada com sucesso.');
+      }
     } catch {
       setSubmitMessage('Erro ao enviar folha de ponto.');
     } finally {
