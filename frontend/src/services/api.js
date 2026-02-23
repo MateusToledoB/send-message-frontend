@@ -1,7 +1,7 @@
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8008')
   .trim()
   .replace(/\/+$/, '');
-const API_LOGIN_PATH = (import.meta.env.VITE_API_LOGIN_PATH || '/api/v1/token').trim();
+const API_LOGIN_PATH = (import.meta.env.VITE_API_LOGIN_PATH || '/api/v1/authenticate').trim();
 
 function buildUrl(path) {
   if (/^https?:\/\//.test(path)) {
@@ -37,24 +37,7 @@ async function apiRequest(path, options = {}) {
   return response.text();
 }
 
-function isTokenPath(path) {
-  return path.endsWith('/token');
-}
-
-function buildLoginRequest(path, { name, password }) {
-  if (isTokenPath(path)) {
-    return {
-      method: 'POST',
-      body: new URLSearchParams({
-        username: name,
-        password,
-      }),
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    };
-  }
-
+function buildLoginRequest({ name, password }) {
   return {
     method: 'POST',
     body: JSON.stringify({ name, password }),
@@ -62,30 +45,17 @@ function buildLoginRequest(path, { name, password }) {
 }
 
 export async function authenticate({ name, password }) {
-  const attempts = [API_LOGIN_PATH, '/api/v1/authenticate'].filter(
-    (path, index, list) => list.indexOf(path) === index,
-  );
-  let lastError;
-
-  for (const path of attempts) {
-    try {
-      return await apiRequest(path, buildLoginRequest(path, { name, password }));
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw lastError;
+  return apiRequest(API_LOGIN_PATH, buildLoginRequest({ name, password }));
 }
 
-export function sendFolhaPonto({ file, columnName, columnMonth, columnContact }) {
+export function sendFolhaPontoAtivos({ file, columnName, columnMonth, columnContact }) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('column_name', columnName);
   formData.append('column_month', columnMonth);
   formData.append('column_contact', columnContact);
 
-  return apiRequest('/api/v1/send_folha_ponto', {
+  return apiRequest('/api/v1/send_folha_ponto_ativos', {
     method: 'POST',
     body: formData,
   });

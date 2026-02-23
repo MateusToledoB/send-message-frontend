@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { sendFolhaPonto } from '../../services/api';
+import { sendFolhaPontoAtivos } from '../../services/api';
 import './index.css';
 
 let xlsxModulePromise;
@@ -119,7 +119,7 @@ function IndexPage() {
     setSubmitMessage('');
 
     try {
-      const response = await sendFolhaPonto({
+      const response = await sendFolhaPontoAtivos({
         file: uploadedFile,
         columnName: nameColumn,
         columnMonth: competencyColumn,
@@ -151,11 +151,10 @@ function IndexPage() {
           <button type="button">Ajuda</button>
           <button type="button">Sair</button>
         </nav>
+        <p className="sidebar-tip-signature">TIP - Time de Inovacao e Projetos</p>
       </aside>
 
       <main className="dashboard-main">
-        <div className="dashboard-topbar" aria-hidden="true" />
-
         <form className="dashboard-form" onSubmit={handleSubmit}>
           <label htmlFor="template" className="field-title">
             Qual template deseja enviar?
@@ -165,10 +164,10 @@ function IndexPage() {
             <option value="" disabled>
               Selecione uma opcao
             </option>
-            <option value={TEMPLATE_FOLHA}>Folha de ponto</option>
-            <option value="boas-vindas">Boas-vindas</option>
-            <option value="follow-up">Follow-up</option>
-            <option value="cobranca">Cobranca</option>
+            <option value={TEMPLATE_FOLHA}>Folha de ponto ativos</option>
+            <option value="boas-vindas">Folha de ponto inativos</option>
+            <option value="follow-up">Folha de ponto ativos torre</option>
+            <option value="cobranca">Vagas</option>
           </select>
 
           {template === TEMPLATE_FOLHA && (
@@ -252,11 +251,9 @@ function IndexPage() {
           )}
         </form>
 
-        <footer className="dashboard-footer">2026 - Desenvolvido por Time de Inovacao e Projetos (TIP)</footer>
       </main>
     </div>
   );
 }
 
 export default IndexPage;
-
