@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { sendFolhaPontoAtivos } from '../../services/api';
 import './index.css';
 
@@ -24,6 +24,7 @@ function IndexPage() {
   const [fileError, setFileError] = useState('');
   const [submitMessage, setSubmitMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
 
   const resetFolhaFields = () => {
     setUploadedFile(null);
@@ -35,6 +36,13 @@ function IndexPage() {
     setFileError('');
     setSubmitMessage('');
     setSubmitting(false);
+  };
+  const resetFormToInitialState = () => {
+    setTemplate('');
+    resetFolhaFields();
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleTemplateChange = (event) => {
@@ -119,22 +127,14 @@ function IndexPage() {
     setSubmitMessage('');
 
     try {
-      const response = await sendFolhaPontoAtivos({
+      await sendFolhaPontoAtivos({
         file: uploadedFile,
         columnName: nameColumn,
         columnMonth: competencyColumn,
         columnContact: phoneColumn,
       });
-
-      const publishedMessages = response?.published_messages;
-
-      if (publishedMessages == null || publishedMessages === 0) {
-        setSubmitMessage('Nao tem mensagens para serem enviadas.');
-      } else if (publishedMessages > 0) {
-        setSubmitMessage(`As mensagens vao ser enviadas (${publishedMessages}).`);
-      } else {
-        setSubmitMessage('Folha de ponto enviada com sucesso.');
-      }
+      resetFormToInitialState();
+      window.alert('As mensagens vao ser enviadas.');
     } catch {
       setSubmitMessage('Erro ao enviar folha de ponto.');
     } finally {
@@ -177,6 +177,7 @@ function IndexPage() {
               </label>
               <input
                 id="xlsx-file"
+                ref={fileInputRef}
                 className="file-input-hidden"
                 type="file"
                 accept=".xlsx"
@@ -257,3 +258,4 @@ function IndexPage() {
 }
 
 export default IndexPage;
+
